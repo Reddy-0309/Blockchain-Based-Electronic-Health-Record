@@ -1,0 +1,724 @@
+TITLE: Managing Rust Projects with Cargo
+DESCRIPTION: Cargo is Rust's build system and package manager. It's used to create new projects, build, test, and manage dependencies for Rust applications.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch01-03-hello-cargo.md#2025-04-08_snippet_11
+
+LANGUAGE: Shell
+CODE:
+```
+cargo
+```
+
+----------------------------------------
+
+TITLE: Creating a New Rust Project with Cargo
+DESCRIPTION: Commands to create a new Rust project named 'guessing_game' using Cargo and navigate to the project directory.
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter02.md#2025-04-08_snippet_0
+
+LANGUAGE: shell
+CODE:
+```
+$ cargo new guessing_game
+$ cd guessing_game
+```
+
+----------------------------------------
+
+TITLE: Complete Rust Guessing Game Implementation
+DESCRIPTION: Final implementation of the guessing game including all necessary imports, game logic, input handling, and proper error management
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter02.md#2025-04-08_snippet_23
+
+LANGUAGE: rust
+CODE:
+```
+use rand::Rng;
+use std::cmp::Ordering;
+use std::io;
+
+fn main() {
+    println!("Guess the number!");
+
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+
+    loop {
+        println!("Please input your guess.");
+
+        let mut guess = String::new();
+
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Failed to read line");
+
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        println!("You guessed: {guess}");
+
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too small!"),
+            Ordering::Greater => println!("Too big!"),
+            Ordering::Equal => {
+                println!("You win!");
+                break;
+            }
+        }
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Complete Rust Guessing Game Implementation
+DESCRIPTION: This is the final, complete implementation of the Rust guessing game. It includes all the previously discussed features: looping, handling invalid input, and quitting after a correct guess. The secret number is no longer printed for gameplay purposes.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch02-00-guessing-game-tutorial.md#2025-04-08_snippet_23
+
+LANGUAGE: rust
+CODE:
+```
+use std::io;
+use rand::Rng;
+use std::cmp::Ordering;
+
+fn main() {
+    println!("Guess the number!");
+
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+
+    loop {
+        println!("Please input your guess.");
+
+        let mut guess = String::new();
+
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Failed to read line");
+
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        println!("You guessed: {guess}");
+
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too small!"),
+            Ordering::Greater => println!("Too big!"),
+            Ordering::Equal => {
+                println!("You win!");
+                break;
+            }
+        }
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Function with Parameter and Return Value in Rust
+DESCRIPTION: Demonstrates a function that takes a parameter and returns a computed value.
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter03.md#2025-04-08_snippet_27
+
+LANGUAGE: rust
+CODE:
+```
+fn main() {
+    let x = plus_one(5);
+
+    println!("The value of x is: {x}");
+}
+
+fn plus_one(x: i32) -> i32 {
+    x + 1
+}
+```
+
+----------------------------------------
+
+TITLE: Writing a Failing Rust Test
+DESCRIPTION: Illustrates how to write a test that fails by using the panic! macro, and shows the resulting output when running tests.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch11-01-writing-tests.md#2025-04-08_snippet_3
+
+LANGUAGE: rust
+CODE:
+```
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn exploration() {
+        assert_eq!(2 + 2, 4);
+    }
+
+    #[test]
+    fn another() {
+        panic!("Make this test fail");
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Basic Cargo Version Check Command
+DESCRIPTION: Command to verify Cargo installation by checking its version
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch01-03-hello-cargo.md#2025-04-08_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+$ cargo --version
+```
+
+----------------------------------------
+
+TITLE: Adding the rand Crate as a Dependency in Cargo.toml
+DESCRIPTION: This snippet shows how to specify the rand crate as a dependency in the Cargo.toml file. It sets the version to 0.8.4, which through semantic versioning allows any compatible version from 0.8.4 up to but not including 0.9.0.
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter02.md#2025-04-08_snippet_10
+
+LANGUAGE: toml
+CODE:
+```
+[dependencies]
+rand = "0.8.4"
+```
+
+----------------------------------------
+
+TITLE: Adding Package Metadata in Cargo.toml for Rust Crate
+DESCRIPTION: This snippet shows how to add the required name field to the Cargo.toml file for publishing a Rust crate. The name must be unique on crates.io.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch14-02-publishing-to-crates-io.md#2025-04-08_snippet_7
+
+LANGUAGE: toml
+CODE:
+```
+[package]
+name = "guessing_game"
+```
+
+----------------------------------------
+
+TITLE: Rebuilding and Running a Modified Cargo Project
+DESCRIPTION: When source code is modified, 'cargo run' rebuilds the project before running it. This example shows the output when changes have been made to the source.
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter01.md#2025-04-08_snippet_25
+
+LANGUAGE: bash
+CODE:
+```
+$ cargo run
+   Compiling hello_cargo v0.1.0 (file:///projects/hello_cargo)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.33 secs
+     Running `target/debug/hello_cargo`
+Hello, world!
+```
+
+----------------------------------------
+
+TITLE: Using Default and Custom Trait Methods
+DESCRIPTION: Example of using trait methods where some are default implementations and others are custom implemented.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch10-02-traits.md#2025-04-08_snippet_6
+
+LANGUAGE: rust
+CODE:
+```
+use aggregator::{Summary, SocialPost};
+
+fn main() {
+    let post = SocialPost {
+        username: String::from("horse_ebooks"),
+        content: String::from("of course, as you probably already know, people"),
+    };
+
+    println!("1 new post: {}", post.summarize());
+}
+```
+
+----------------------------------------
+
+TITLE: Using panic! Macro in Rust
+DESCRIPTION: This example shows a simple Rust program that calls the panic! macro to demonstrate how it works and what output it produces.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch09-01-unrecoverable-errors-with-panic.md#2025-04-08_snippet_1
+
+LANGUAGE: rust
+CODE:
+```
+fn main() {
+    panic!("crash and burn");
+}
+```
+
+----------------------------------------
+
+TITLE: Basic Async Data Fetching in Rust
+DESCRIPTION: Demonstrates a simple asynchronous operation to fetch data from a URL using the await keyword. This non-blocking code allows other tasks to run while waiting for the network operation to complete.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch17-00-async-await.md#2025-04-08_snippet_0
+
+LANGUAGE: rust
+CODE:
+```
+let data = fetch_data_from(url).await;
+println!("{data}");
+```
+
+----------------------------------------
+
+TITLE: Adding License Information to Cargo.toml for Rust Crate
+DESCRIPTION: This snippet demonstrates how to specify the license for a Rust crate in the Cargo.toml file. It uses the MIT license as an example.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch14-02-publishing-to-crates-io.md#2025-04-08_snippet_8
+
+LANGUAGE: toml
+CODE:
+```
+[package]
+name = "guessing_game"
+license = "MIT"
+```
+
+----------------------------------------
+
+TITLE: Handling Comparison of Two Numbers in Rust Using match Expression
+DESCRIPTION: Code snippet demonstrating how to compare a user's guess with a secret number using the std::cmp::Ordering enum and match pattern matching. This code doesn't compile yet due to type mismatches between String and number types.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch02-00-guessing-game-tutorial.md#2025-04-08_snippet_18
+
+LANGUAGE: rust
+CODE:
+```
+use std::io;
+use std::cmp::Ordering;
+use rand::Rng;
+
+fn main() {
+    println!("Guess the number!");
+
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+
+    println!("The secret number is: {secret_number}");
+
+    println!("Please input your guess.");
+
+    let mut guess = String::new();
+
+    io::stdin()
+        .read_line(&mut guess)
+        .expect("Failed to read line");
+
+    println!("You guessed: {guess}");
+
+    match guess.cmp(&secret_number) {
+        Ordering::Less => println!("Too small!"),
+        Ordering::Greater => println!("Too big!"),
+        Ordering::Equal => println!("You win!"),
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Complete Rust Search Function Implementation
+DESCRIPTION: The final implementation of the search function that collects and returns all lines containing the query string. It stores matching lines in a vector and returns it.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch12-04-testing-the-librarys-functionality.md#2025-04-08_snippet_4
+
+LANGUAGE: rust
+CODE:
+```
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
+    let mut results = Vec::new();
+
+    for line in contents.lines() {
+        if line.contains(query) {
+            results.push(line);
+        }
+    }
+
+    results
+}
+```
+
+----------------------------------------
+
+TITLE: Complete Cargo.toml Example for Publishing Rust Crate
+DESCRIPTION: This snippet shows a complete Cargo.toml file ready for publishing a Rust crate. It includes name, version, edition, description, and license fields.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch14-02-publishing-to-crates-io.md#2025-04-08_snippet_9
+
+LANGUAGE: toml
+CODE:
+```
+[package]
+name = "guessing_game"
+version = "0.1.0"
+edition = "2024"
+description = "A fun game where you guess what number the computer has chosen."
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+```
+
+----------------------------------------
+
+TITLE: Using Mutex for Shared State Concurrency in Rust
+DESCRIPTION: This example demonstrates the basic usage of a Mutex in Rust to safely access and modify shared data. It shows how to create a Mutex, acquire a lock, modify the data, and automatically release the lock.
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter16.md#2025-04-08_snippet_13
+
+LANGUAGE: rust
+CODE:
+```
+use std::sync::Mutex;
+
+fn main() {
+    let m = Mutex::new(5);
+
+    {
+        let mut num = m.lock().unwrap();
+        *num = 6;
+    }
+
+    println!("m = {m:?}");
+}
+```
+
+----------------------------------------
+
+TITLE: Creating a Custom Guess Type with Validation in Rust
+DESCRIPTION: This snippet defines a custom `Guess` type in a `guessing_game` module. It includes a constructor that validates the input range and a getter method for the value. This approach encapsulates the validation logic and ensures type-level correctness.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch09-03-to-panic-or-not-to-panic.md#2025-04-08_snippet_2
+
+LANGUAGE: rust
+CODE:
+```
+pub struct Guess {
+    value: i32,
+}
+
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 || value > 100 {
+            panic!("Guess value must be between 1 and 100, got {}.", value);
+        }
+
+        Guess { value }
+    }
+
+    pub fn value(&self) -> i32 {
+        self.value
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Complete ThreadPool Library Implementation
+DESCRIPTION: Full implementation of the thread pool library including worker management, job execution, and graceful shutdown capabilities. Includes comprehensive error handling and thread synchronization.
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter21.md#2025-04-08_snippet_38
+
+LANGUAGE: rust
+CODE:
+```
+use std::{
+    sync::{mpsc, Arc, Mutex},
+    thread,
+};
+
+pub struct ThreadPool {
+    workers: Vec<Worker>,
+    sender: Option<mpsc::Sender<Job>>,
+}
+
+type Job = Box<dyn FnOnce() + Send + 'static>;
+
+impl ThreadPool {
+    /// Create a new ThreadPool.
+    ///
+    /// The size is the number of threads in the pool.
+    ///
+    /// # Panics
+    ///
+    /// The `new` function will panic if the size is zero.
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let (sender, receiver) = mpsc::channel();
+
+        let receiver = Arc::new(Mutex::new(receiver));
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id, Arc::clone(&receiver)));
+        }
+
+        ThreadPool {
+            workers,
+            sender: Some(sender),
+        }
+    }
+
+    pub fn execute<F>(&self, f: F)
+    where
+        F: FnOnce() + Send + 'static,
+    {
+        let job = Box::new(f);
+
+        self.sender.as_ref().unwrap().send(job).unwrap();
+    }
+}
+
+impl Drop for ThreadPool {
+    fn drop(&mut self) {
+        drop(self.sender.take());
+
+        for worker in &mut self.workers {
+            println!("Shutting down worker {}", worker.id);
+
+            if let Some(thread) = worker.thread.take() {
+                thread.join().unwrap();
+            }
+        }
+    }
+}
+
+struct Worker {
+    id: usize,
+    thread: Option<thread::JoinHandle<()>>,
+}
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        let thread = thread::spawn(move || loop {
+            let message = receiver.lock().unwrap().recv();
+
+            match message {
+                Ok(job) => {
+                    println!("Worker {id} got a job; executing.");
+
+                    job();
+                }
+                Err(_) => {
+                    println!("Worker {id} disconnected; shutting down.");
+                    break;
+                }
+            }
+        });
+
+        Worker {
+            id,
+            thread: Some(thread),
+        }
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Definition of the Future Trait with Pin
+DESCRIPTION: The definition of Rust's Future trait showing how the poll method requires a Pin-wrapped mutable reference to self. This is the key method that async/await uses under the hood to determine if a future is ready.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch17-05-traits-for-async.md#2025-04-08_snippet_5
+
+LANGUAGE: rust
+CODE:
+```
+use std::pin::Pin;
+use std::task::{Context, Poll};
+
+pub trait Future {
+    type Output;
+
+    // Required method
+    fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output>;
+}
+```
+
+----------------------------------------
+
+TITLE: Creating a New Rust Project with Cargo
+DESCRIPTION: This snippet demonstrates how to create a new Rust project using the Cargo command line tool. It shows the command to create a new project and the resulting directory structure.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch07-01-packages-and-crates.md#2025-04-08_snippet_0
+
+LANGUAGE: console
+CODE:
+```
+$ cargo new my-project
+     Created binary (application) `my-project` package
+$ ls my-project
+Cargo.toml
+src
+$ ls my-project/src
+main.rs
+```
+
+----------------------------------------
+
+TITLE: Implementing Value Calculation Using Match with Coin Enum in Rust
+DESCRIPTION: This snippet defines a Coin enum with different coin variants and uses match to determine the cent value of each coin type. The match expression compares the coin value to each pattern and returns the corresponding value in cents.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch06-02-match.md#2025-04-08_snippet_0
+
+LANGUAGE: rust
+CODE:
+```
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Chaining Method Calls in Rust
+DESCRIPTION: Shows how to chain method calls in Rust to improve code readability, specifically demonstrating how to call read_line and expect on the result of stdin().
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch02-00-guessing-game-tutorial.md#2025-04-08_snippet_10
+
+LANGUAGE: rust
+CODE:
+```
+io::stdin().read_line(&mut guess).expect("Failed to read line");
+```
+
+----------------------------------------
+
+TITLE: Range-based For Loop with Reverse
+DESCRIPTION: Shows how to use a for loop with a range and the rev() method to count down. This demonstrates a more idiomatic way to implement countdown functionality in Rust.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch03-05-control-flow.md#2025-04-08_snippet_9
+
+LANGUAGE: rust
+CODE:
+```
+fn main() {
+    for number in (1..4).rev() {
+        println!("{number}!");
+    }
+    println!("LIFTOFF!!!");
+}
+```
+
+----------------------------------------
+
+TITLE: Running Tests Sequentially in Rust Using Test-Threads
+DESCRIPTION: A command that runs Rust tests in a single thread to prevent test interference when tests share state or resources. This is helpful when tests might conflict by writing to the same files or depending on shared environment.
+SOURCE: https://github.com/rust-lang/book/blob/main/nostarch/chapter11.md#2025-04-08_snippet_19
+
+LANGUAGE: bash
+CODE:
+```
+$ cargo test -- --test-threads=1
+```
+
+----------------------------------------
+
+TITLE: Testing Rectangle can_hold Method with assert! Macro
+DESCRIPTION: Unit test implementation for the Rectangle struct's can_hold method using the assert! macro to verify correct behavior with different sized rectangles.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch11-01-writing-tests.md#2025-04-08_snippet_6
+
+LANGUAGE: rust
+CODE:
+```
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn larger_can_hold_smaller() {
+        let larger = Rectangle {
+            width: 8,
+            height: 7,
+        };
+        let smaller = Rectangle {
+            width: 5,
+            height: 1,
+        };
+
+        assert!(larger.can_hold(&smaller));
+    }
+}
+```
+
+----------------------------------------
+
+TITLE: Installing dprint for markdown and non-Rust code formatting
+DESCRIPTION: Command to install dprint using Cargo, which is used for formatting markdown and non-Rust code in the project.
+SOURCE: https://github.com/rust-lang/book/blob/main/CONTRIBUTING.md#2025-04-08_snippet_1
+
+LANGUAGE: sh
+CODE:
+```
+cargo install dprint
+```
+
+----------------------------------------
+
+TITLE: Implementing Random Number Generation in Rust
+DESCRIPTION: Complete implementation of a guessing game program that generates a random number using the rand crate. The code imports the Rng trait, uses thread_rng to get a random number generator, and calls gen_range to generate a number between 1 and 100.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch02-00-guessing-game-tutorial.md#2025-04-08_snippet_16
+
+LANGUAGE: rust
+CODE:
+```
+use std::io;
+use rand::Rng;
+
+fn main() {
+    println!("Guess the number!");
+
+    let secret_number = rand::thread_rng().gen_range(1..=100);
+
+    println!("The secret number is: {secret_number}");
+
+    println!("Please input your guess.");
+
+    let mut guess = String::new();
+
+    io::stdin()
+        .read_line(&mut guess)
+        .expect("Failed to read line");
+
+    println!("You guessed: {guess}");
+}
+```
+
+----------------------------------------
+
+TITLE: Using Arc and Mutex for Thread-Safe Receiver Sharing in Rust
+DESCRIPTION: This code snippet shows how to use Arc and Mutex to safely share the receiver among multiple Worker instances in a ThreadPool implementation.
+SOURCE: https://github.com/rust-lang/book/blob/main/src/ch21-02-multithreaded.md#2025-04-08_snippet_11
+
+LANGUAGE: rust
+CODE:
+```
+use std::sync::Arc;
+use std::sync::Mutex;
+
+impl ThreadPool {
+    pub fn new(size: usize) -> ThreadPool {
+        assert!(size > 0);
+
+        let (sender, receiver) = mpsc::channel();
+
+        let receiver = Arc::new(Mutex::new(receiver));
+
+        let mut workers = Vec::with_capacity(size);
+
+        for id in 0..size {
+            workers.push(Worker::new(id, Arc::clone(&receiver)));
+        }
+
+        ThreadPool { workers, sender }
+    }
+}
+
+impl Worker {
+    fn new(id: usize, receiver: Arc<Mutex<mpsc::Receiver<Job>>>) -> Worker {
+        let thread = thread::spawn(move || {
+            receiver;
+        });
+
+        Worker { id, thread }
+    }
+}
+```

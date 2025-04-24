@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain EHR API Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui.css" />
+    <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@4.5.0/favicon-32x32.png" sizes="32x32" />
+    <link rel="icon" type="image/png" href="https://unpkg.com/swagger-ui-dist@4.5.0/favicon-16x16.png" sizes="16x16" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+        
+        body {
+            margin: 0;
+            background: #fafafa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        .swagger-ui .topbar {
+            background-color: #2c3e50;
+        }
+
+        .swagger-ui .info .title {
+            color: #2c3e50;
+        }
+
+        .swagger-ui .opblock.opblock-post {
+            background: rgba(73, 204, 144, 0.1);
+            border-color: #49cc90;
+        }
+
+        .swagger-ui .opblock.opblock-get {
+            background: rgba(97, 175, 254, 0.1);
+            border-color: #61affe;
+        }
+
+        .swagger-ui .opblock.opblock-put {
+            background: rgba(252, 161, 48, 0.1);
+            border-color: #fca130;
+        }
+
+        .swagger-ui .opblock.opblock-delete {
+            background: rgba(249, 62, 62, 0.1);
+            border-color: #f93e3e;
+        }
+
+        .swagger-ui .btn.execute {
+            background-color: #4990e2;
+            color: #fff;
+            border-color: #4990e2;
+        }
+
+        .swagger-ui .btn.authorize {
+            background-color: #2c3e50;
+            color: #fff;
+            border-color: #2c3e50;
+        }
+
+        /* Custom header */
+        .custom-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .custom-header p {
+            margin: 10px 0 0;
+            font-size: 1.2em;
+            opacity: 0.8;
+        }
+
+        .custom-header .blockchain-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        /* Features section */
+        .features {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 15px;
+            max-width: 250px;
+        }
+
+        .feature i {
+            font-size: 2em;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .feature h3 {
+            margin: 0 0 10px;
+            color: #2c3e50;
+        }
+
+        .feature p {
+            color: #7f8c8d;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .custom-footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+            font-size: 0.9em;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .features {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .feature {
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="custom-header">
+        <div class="blockchain-icon">
+            <i class="fas fa-cubes"></i>
+        </div>
+        <h1>Blockchain-Based EHR System</h1>
+        <p>Secure, Transparent, and Efficient Healthcare Records Management</p>
+    </div>
+
+    <div class="features">
+        <div class="feature">
+            <i class="fas fa-lock"></i>
+            <h3>Secure</h3>
+            <p>End-to-end encryption and blockchain technology ensure your health data remains private and tamper-proof.</p>
+        </div>
+        <div class="feature">
+            <i class="fas fa-exchange-alt"></i>
+            <h3>Interoperable</h3>
+            <p>Seamlessly share and access health records across different healthcare providers and systems.</p>
+        </div>
+        <div class="feature">
+            <i class="fas fa-user-shield"></i>
+            <h3>Patient Control</h3>
+            <p>Patients maintain ownership and control over who can access their health information.</p>
+        </div>
+        <div class="feature">
+            <i class="fas fa-history"></i>
+            <h3>Immutable History</h3>
+            <p>Complete audit trail of all record access and modifications for full transparency.</p>
+        </div>
+    </div>
+
+    <div id="swagger-ui"></div>
+
+    <div class="custom-footer">
+        <p> 2025 Blockchain-Based Electronic Health Records System | <a href="#" style="color: #3498db;">Privacy Policy</a> | <a href="#" style="color: #3498db;">Terms of Service</a></p>
+    </div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-bundle.js" charset="UTF-8"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@4.5.0/swagger-ui-standalone-preset.js" charset="UTF-8"></script>
+    <script>
+        window.onload = function() {
+            const ui = SwaggerUIBundle({
+                url: "/api-docs",
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                requestInterceptor: (req) => {
+                    // Add authorization header if token exists in localStorage
+                    const token = localStorage.getItem('auth_token');
+                    if (token) {
+                        req.headers['Authorization'] = `Bearer ${token}`;
+                    }
+                    return req;
+                }
+            });
+
+            window.ui = ui;
+        };
+    </script>
+</body>
+</html>

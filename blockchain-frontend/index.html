@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedChain - Blockchain Health Records</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Load Bootstrap JS in the head to ensure it's available immediately -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        /* Dashboard Cards */
+        .dashboard-card {
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        .dashboard-card .icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--bs-primary);
+        }
+        .dashboard-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        /* Section Display */
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        
+        /* Role-specific elements */
+        .patient-only, .doctor-only, .admin-only {
+            display: none;
+        }
+        
+        /* Modal customization */
+        .modal {
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-header {
+            border-bottom: 2px solid var(--bs-primary);
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="bi bi-shield-lock-fill me-2"></i>MedChain
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" id="dashboard-link" onclick="showSection('dashboard-section')">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item patient-only doctor-only admin-only" style="display: none;">
+                        <a class="nav-link" href="#" id="records-link" onclick="showSection('records-section')">
+                            <i class="bi bi-file-medical me-1"></i> Health Records
+                        </a>
+                    </li>
+                    <li class="nav-item patient-only" style="display: none;">
+                        <a class="nav-link" href="#" id="access-link" onclick="showSection('access-section')">
+                            <i class="bi bi-person-lock me-1"></i> Access Control
+                        </a>
+                    </li>
+                    <li class="nav-item doctor-only" style="display: none;">
+                        <a class="nav-link" href="#" id="patients-link" onclick="showSection('patients-section')">
+                            <i class="bi bi-people me-1"></i> My Patients
+                        </a>
+                    </li>
+                    <li class="nav-item admin-only" style="display: none;">
+                        <a class="nav-link" href="#" id="users-link" onclick="showSection('users-section')">
+                            <i class="bi bi-people me-1"></i> Users
+                        </a>
+                    </li>
+                    <li class="nav-item admin-only" style="display: none;">
+                        <a class="nav-link" href="#" id="blockchain-link" onclick="showSection('blockchain-section')">
+                            <i class="bi bi-box me-1"></i> Blockchain
+                        </a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center">
+                    <div class="user-info me-3 text-white" style="display: none;">
+                        <i class="bi bi-person-circle me-1"></i>
+                        <span id="username-display">User</span>
+                    </div>
+                    <button class="btn btn-outline-light me-2" id="login-btn" onclick="document.getElementById('login-modal').classList.add('show'); document.getElementById('login-modal').style.display = 'block'; document.getElementById('login-modal').setAttribute('aria-modal', 'true'); document.getElementById('login-modal').setAttribute('role', 'dialog');">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Login
+                    </button>
+                    <button class="btn btn-light" id="register-btn" onclick="document.getElementById('register-modal').classList.add('show'); document.getElementById('register-modal').style.display = 'block'; document.getElementById('register-modal').setAttribute('aria-modal', 'true'); document.getElementById('register-modal').setAttribute('role', 'dialog');">
+                        <i class="bi bi-person-plus me-1"></i> Register
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="container mt-4 mb-5">
+        <!-- Dashboard Section -->
+        <div id="dashboard-section" class="section active">
+            <h2 class="mb-4"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+            <div class="row mb-4 align-items-center">
+                <div class="col-md-8">
+                    <h2 class="section-title"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+                    <p class="lead text-muted">Welcome to MedChain, a secure blockchain-based health records system.</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="alert alert-info p-2 d-inline-block">
+                        <i class="bi bi-info-circle me-1"></i> Last login: <span id="last-login-time">Today, 10:45 AM</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Login prompt for guests -->
+            <div id="guest-dashboard" class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-body p-5 text-center">
+                            <img src="https://cdn-icons-png.flaticon.com/512/7613/7613882.png" alt="Health Records" class="img-fluid mb-4" style="max-width: 150px;">
+                            <h3>Secure Health Records on Blockchain</h3>
+                            <p class="lead">Please login or register to access your health records and medical information.</p>
+                            <div class="mt-4">
+                                <button class="btn btn-primary btn-lg me-2" id="dashboard-login-btn" onclick="document.getElementById('login-modal').classList.add('show'); document.getElementById('login-modal').style.display = 'block'; document.getElementById('login-modal').setAttribute('aria-modal', 'true'); document.getElementById('login-modal').setAttribute('role', 'dialog');">
+                                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                                </button>
+                                <button class="btn btn-outline-primary btn-lg" id="dashboard-register-btn" onclick="document.getElementById('register-modal').classList.add('show'); document.getElementById('register-modal').style.display = 'block'; document.getElementById('register-modal').setAttribute('aria-modal', 'true'); document.getElementById('register-modal').setAttribute('role', 'dialog');">
+                                    <i class="bi bi-person-plus me-2"></i>Register
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Patient Dashboard -->
+            <div id="patient-dashboard" class="role-dashboard" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-file-medical"></i></div>
+                                <h3 id="patient-record-count">0</h3>
+                                <p>Health Records</p>
+                                <button class="btn btn-primary mt-2" onclick="showSection('records-section')">
+                                    <i class="bi bi-eye me-1"></i> View Records
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-shield-lock"></i></div>
+                                <h3 id="patient-access-count">0</h3>
+                                <p>Access Grants</p>
+                                <button class="btn btn-primary mt-2" onclick="showSection('access-section')">
+                                    <i class="bi bi-people me-1"></i> Manage Access
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-calendar-plus"></i></div>
+                                <h3>Schedule</h3>
+                                <p>Book appointments</p>
+                                <button class="btn btn-success mt-2" onclick="alert('Appointment scheduling feature will be available soon!')">
+                                    <i class="bi bi-plus-lg me-1"></i> New Appointment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-activity me-2"></i>Recent Activity</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush" id="patient-activity-list">
+                                    <!-- Activity items will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-calendar-week me-2"></i>Upcoming Appointments</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush" id="patient-appointments-list">
+                                    <!-- Appointments will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Doctor Dashboard -->
+            <div id="doctor-dashboard" class="role-dashboard" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-people"></i></div>
+                                <h3 id="doctor-patient-count">0</h3>
+                                <p>Patients</p>
+                                <button class="btn btn-primary mt-2" onclick="showSection('patients-section')">
+                                    <i class="bi bi-list-ul me-1"></i> View Patients
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-journal-medical"></i></div>
+                                <h3 id="doctor-record-count">0</h3>
+                                <p>Records Created</p>
+                                <button class="btn btn-primary mt-2" onclick="showSection('records-section')">
+                                    <i class="bi bi-eye me-1"></i> View Records
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-file-earmark-plus"></i></div>
+                                <h3>New Record</h3>
+                                <p>Create patient record</p>
+                                <button class="btn btn-success mt-2" onclick="document.getElementById('create-record-modal').classList.add('show'); document.getElementById('create-record-modal').style.display = 'block'; document.getElementById('create-record-modal').setAttribute('aria-modal', 'true'); document.getElementById('create-record-modal').setAttribute('role', 'dialog');">
+                                    <i class="bi bi-plus-lg me-1"></i> Create Record
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="bi bi-calendar-week me-2"></i>Today's Appointments</h5>
+                                <button class="btn btn-sm btn-outline-primary" onclick="alert('View all appointments feature will be available soon!');">View All</button>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Time</th>
+                                                <th>Patient</th>
+                                                <th>Type</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="doctor-appointments-table">
+                                            <!-- Appointments will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Recent Notifications</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush" id="doctor-notifications-list">
+                                    <!-- Notifications will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Admin Dashboard -->
+            <div id="admin-dashboard" class="role-dashboard" style="display: none;">
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-people"></i></div>
+                                <h3 id="admin-user-count">0</h3>
+                                <p>Total Users</p>
+                                <button class="btn btn-primary mt-2" onclick="showSection('users-section')">
+                                    <i class="bi bi-list-ul me-1"></i> Manage Users
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-file-medical"></i></div>
+                                <h3 id="admin-record-count">0</h3>
+                                <p>Total Records</p>
+                                <button class="btn btn-primary mt-2" onclick="showSection('records-section')">
+                                    <i class="bi bi-eye me-1"></i> View Records
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-box"></i></div>
+                                <h3 id="admin-block-count">0</h3>
+                                <p>Blockchain Blocks</p>
+                                <button class="btn btn-primary mt-2" onclick="showSection('blockchain-section')">
+                                    <i class="bi bi-eye me-1"></i> View Blockchain
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-4">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body dashboard-card">
+                                <div class="icon"><i class="bi bi-shield-check"></i></div>
+                                <h3 id="admin-audit-count">0</h3>
+                                <p>Audit Logs</p>
+                                <button class="btn btn-primary mt-2" onclick="alert('Audit logs feature will be available soon!');">
+                                    <i class="bi bi-list-check me-1"></i> View Logs
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><i class="bi bi-activity me-2"></i>System Health</h5>
+                                <div>
+                                    <span class="badge bg-success me-2">Status: Online</span>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="alert('System details feature will be available soon!');">Details</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>CPU Usage</h6>
+                                        <div class="progress mb-3">
+                                            <div class="progress-bar" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">25%</div>
+                                        </div>
+                                        
+                                        <h6>Memory Usage</h6>
+                                        <div class="progress mb-3">
+                                            <div class="progress-bar" role="progressbar" style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">40%</div>
+                                        </div>
+                                        
+                                        <h6>Disk Usage</h6>
+                                        <div class="progress mb-3">
+                                            <div class="progress-bar" role="progressbar" style="width: 60%" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100">60%</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Blockchain Status</h6>
+                                        <p><span class="badge bg-success">Valid</span> Last validated: Today, 19:00</p>
+                                        
+                                        <h6>Last Block</h6>
+                                        <p><code>0x8f72d3...</code> Created: 5 minutes ago</p>
+                                        
+                                        <h6>API Status</h6>
+                                        <p><span class="badge bg-success">Online</span> Response time: 120ms</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="bi bi-bell me-2"></i>System Alerts</h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="list-group list-group-flush" id="admin-alerts-list">
+                                    <!-- Alerts will be loaded here -->
+                                </div>
+                            </div>
+                            <div class="card-footer text-center">
+                                <button class="btn btn-sm btn-primary" onclick="runSystemCheck(); alert('System check initiated. Results will be available shortly.');">
+                                    <i class="bi bi-check-circle me-1"></i> Run System Check
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Health Records Section -->
+        <div id="records-section" class="section">
+            <h2 class="mb-4"><i class="bi bi-file-medical me-2"></i>Health Records</h2>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Health Records</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="alert('Filter records feature will be available soon!');"><i class="bi bi-funnel me-1"></i>Filter</button>
+                        <button class="btn btn-sm btn-primary" onclick="document.getElementById('create-record-modal').classList.add('show'); document.getElementById('create-record-modal').style.display = 'block'; document.getElementById('create-record-modal').setAttribute('aria-modal', 'true'); document.getElementById('create-record-modal').setAttribute('role', 'dialog');"><i class="bi bi-plus-lg me-1"></i>New Record</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                    <th>Provider</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="health-records-table">
+                                <tr>
+                                    <td>2023-05-10</td>
+                                    <td>Annual Physical Examination</td>
+                                    <td><span class="badge bg-info">Consultation</span></td>
+                                    <td>Dr. Smith</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View record details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="alert('Download record feature will be available soon!');"><i class="bi bi-download"></i></button>
+                                        <button class="btn btn-sm btn-outline-info" onclick="alert('Share record feature will be available soon!');"><i class="bi bi-share"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2023-04-15</td>
+                                    <td>Blood Test Results</td>
+                                    <td><span class="badge bg-primary">Lab Result</span></td>
+                                    <td>City Medical Lab</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View record details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="alert('Download record feature will be available soon!');"><i class="bi bi-download"></i></button>
+                                        <button class="btn btn-sm btn-outline-info" onclick="alert('Share record feature will be available soon!');"><i class="bi bi-share"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>2023-03-22</td>
+                                    <td>Flu Vaccination</td>
+                                    <td><span class="badge bg-warning">Immunization</span></td>
+                                    <td>Community Health Clinic</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View record details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-secondary me-1" onclick="alert('Download record feature will be available soon!');"><i class="bi bi-download"></i></button>
+                                        <button class="btn btn-sm btn-outline-info" onclick="alert('Share record feature will be available soon!');"><i class="bi bi-share"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Access Control Section -->
+        <div id="access-section" class="section">
+            <h2 class="mb-4"><i class="bi bi-person-lock me-2"></i>Access Control</h2>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Active Access Grants</h5>
+                    <button class="btn btn-sm btn-primary" onclick="alert('Grant access feature will be available soon!');"><i class="bi bi-plus-lg me-1"></i>Grant Access</button>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Provider</th>
+                                    <th>Access Level</th>
+                                    <th>Granted On</th>
+                                    <th>Expires On</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Dr. Smith</td>
+                                    <td>Full Access</td>
+                                    <td>2023-04-10</td>
+                                    <td>2023-10-10</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="alert('Edit access feature will be available soon!');"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="alert('Revoke access feature will be available soon!');"><i class="bi bi-x-circle"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Johnson</td>
+                                    <td>Read Only</td>
+                                    <td>2023-03-15</td>
+                                    <td>2023-09-15</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="alert('Edit access feature will be available soon!');"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="alert('Revoke access feature will be available soon!');"><i class="bi bi-x-circle"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Patients Section -->
+        <div id="patients-section" class="section">
+            <h2 class="mb-4"><i class="bi bi-people me-2"></i>My Patients</h2>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Patient List</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="alert('Filter patients feature will be available soon!');"><i class="bi bi-funnel me-1"></i>Filter</button>
+                        <button class="btn btn-sm btn-primary" onclick="alert('Add patient feature will be available soon!');"><i class="bi bi-plus-lg me-1"></i>Add Patient</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Gender</th>
+                                    <th>Last Visit</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>John Doe</td>
+                                    <td>45</td>
+                                    <td>Male</td>
+                                    <td>2023-05-10</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View patient details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success me-1" onclick="alert('Create record feature will be available soon!');"><i class="bi bi-file-earmark-plus"></i></button>
+                                        <button class="btn btn-sm btn-outline-info" onclick="alert('Schedule appointment feature will be available soon!');"><i class="bi bi-calendar-plus"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Jane Smith</td>
+                                    <td>32</td>
+                                    <td>Female</td>
+                                    <td>2023-04-22</td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View patient details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-success me-1" onclick="alert('Create record feature will be available soon!');"><i class="bi bi-file-earmark-plus"></i></button>
+                                        <button class="btn btn-sm btn-outline-info" onclick="alert('Schedule appointment feature will be available soon!');"><i class="bi bi-calendar-plus"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Users Section -->
+        <div id="users-section" class="section">
+            <h2 class="mb-4"><i class="bi bi-people me-2"></i>Users Management</h2>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">All Users</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="alert('Filter users feature will be available soon!');"><i class="bi bi-funnel me-1"></i>Filter</button>
+                        <button class="btn btn-sm btn-primary" onclick="alert('Add user feature will be available soon!');"><i class="bi bi-plus-lg me-1"></i>Add User</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>John Doe</td>
+                                    <td>john@example.com</td>
+                                    <td><span class="badge bg-info">Patient</span></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>2023-05-10 10:30 AM</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View user details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="alert('Edit user feature will be available soon!');"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="alert('Deactivate user feature will be available soon!');"><i class="bi bi-person-x"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Dr. Smith</td>
+                                    <td>doctor@example.com</td>
+                                    <td><span class="badge bg-primary">Doctor</span></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>2023-05-10 8:15 AM</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View user details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="alert('Edit user feature will be available soon!');"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="alert('Deactivate user feature will be available soon!');"><i class="bi bi-person-x"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Admin User</td>
+                                    <td>admin@example.com</td>
+                                    <td><span class="badge bg-danger">Admin</span></td>
+                                    <td><span class="badge bg-success">Active</span></td>
+                                    <td>2023-05-10 9:45 AM</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary me-1" onclick="alert('View user details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                        <button class="btn btn-sm btn-outline-warning me-1" onclick="alert('Edit user feature will be available soon!');"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="alert('Deactivate user feature will be available soon!');"><i class="bi bi-person-x"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Blockchain Section -->
+        <div id="blockchain-section" class="section">
+            <h2 class="mb-4"><i class="bi bi-box me-2"></i>Blockchain Explorer</h2>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Blockchain Status</h5>
+                    <div>
+                        <span class="badge bg-success me-2">Valid</span>
+                        <button class="btn btn-sm btn-outline-primary" onclick="alert('Validate blockchain feature will be available soon!');"><i class="bi bi-check-circle me-1"></i>Validate</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total Blocks</h6>
+                                    <h2 class="mb-0">28</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total Transactions</h6>
+                                    <h2 class="mb-0">156</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Last Block Time</h6>
+                                    <h2 class="mb-0">5 min</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Chain Size</h6>
+                                    <h2 class="mb-0">2.4 MB</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mb-3">Recent Blocks</h5>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Block #</th>
+                                    <th>Hash</th>
+                                    <th>Timestamp</th>
+                                    <th>Transactions</th>
+                                    <th>Size</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>28</td>
+                                    <td><code>0x8f72d3a2...</code></td>
+                                    <td>2023-05-10 14:30:15</td>
+                                    <td>5</td>
+                                    <td>84 KB</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="alert('View block details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>27</td>
+                                    <td><code>0x6a91b5c7...</code></td>
+                                    <td>2023-05-10 13:15:22</td>
+                                    <td>3</td>
+                                    <td>62 KB</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="alert('View block details feature will be available soon!');"><i class="bi bi-eye"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Login Modal -->
+    <div class="modal fade" id="login-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login</h5>
+                    <button type="button" class="btn-close" onclick="document.getElementById('login-modal').classList.remove('show'); document.getElementById('login-modal').style.display = 'none'; document.getElementById('login-modal').removeAttribute('aria-modal'); document.getElementById('login-modal').removeAttribute('role');"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form" onsubmit="event.preventDefault(); simulateLogin(document.getElementById('login-email').value);">
+                        <div class="mb-3">
+                            <label for="login-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="login-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="login-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="login-password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div class="modal fade" id="register-modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Register</h5>
+                    <button type="button" class="btn-close" onclick="document.getElementById('register-modal').classList.remove('show'); document.getElementById('register-modal').style.display = 'none'; document.getElementById('register-modal').removeAttribute('aria-modal'); document.getElementById('register-modal').removeAttribute('role');"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="register-form" onsubmit="event.preventDefault(); simulateRegistration(document.getElementById('register-name').value, document.getElementById('register-email').value, document.getElementById('register-password').value, document.getElementById('register-role').value);">
+                        <div class="mb-3">
+                            <label for="register-name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="register-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="register-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="register-password" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-role" class="form-label">Role</label>
+                            <select class="form-select" id="register-role" required>
+                                <option value="Patient">Patient</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Register</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Record Modal -->
+    <div class="modal fade" id="create-record-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-file-earmark-plus me-2"></i>Create Health Record</h5>
+                    <button type="button" class="btn-close" onclick="document.getElementById('create-record-modal').classList.remove('show'); document.getElementById('create-record-modal').style.display = 'none'; document.getElementById('create-record-modal').removeAttribute('aria-modal'); document.getElementById('create-record-modal').setAttribute('aria-hidden', 'true'); document.body.classList.remove('modal-open'); document.body.style.removeProperty('overflow'); document.body.style.removeProperty('padding-right');"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="create-record-form">
+                        <div class="mb-3">
+                            <label for="record-patient" class="form-label">Patient</label>
+                            <select class="form-select" id="record-patient" required>
+                                <option value="" selected disabled>Select patient</option>
+                                <option value="patient1">John Doe</option>
+                                <option value="patient2">Jane Smith</option>
+                                <option value="patient3">Robert Johnson</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record-type" class="form-label">Record Type</label>
+                            <select class="form-select" id="record-type" required>
+                                <option value="" selected disabled>Select record type</option>
+                                <option value="consultation">Consultation</option>
+                                <option value="lab-result">Lab Result</option>
+                                <option value="prescription">Prescription</option>
+                                <option value="imaging">Imaging</option>
+                                <option value="procedure">Procedure</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record-title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="record-title" placeholder="Record title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record-content" class="form-label">Content</label>
+                            <textarea class="form-control" id="record-content" rows="5" placeholder="Record details" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record-date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="record-date" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="record-consent">
+                            <label class="form-check-label" for="record-consent">I confirm that I have the patient's consent to create this record</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('create-record-modal').classList.remove('show'); document.getElementById('create-record-modal').style.display = 'none'; document.getElementById('create-record-modal').removeAttribute('aria-modal'); document.getElementById('create-record-modal').setAttribute('aria-hidden', 'true'); document.body.classList.remove('modal-open'); document.body.style.removeProperty('overflow'); document.body.style.removeProperty('padding-right');">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="alert('Record created successfully!'); document.getElementById('create-record-modal').classList.remove('show'); document.getElementById('create-record-modal').style.display = 'none'; document.getElementById('create-record-modal').removeAttribute('aria-modal'); document.getElementById('create-record-modal').setAttribute('aria-hidden', 'true'); document.body.classList.remove('modal-open'); document.body.style.removeProperty('overflow'); document.body.style.removeProperty('padding-right');">Create Record</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Direct authentication functions for immediate availability
+        function simulateLogin(email) {
+            // Determine role based on email prefix for demo purposes
+            let role = 'Patient';
+            if (email.startsWith('doctor')) {
+                role = 'Doctor';
+            } else if (email.startsWith('admin')) {
+                role = 'Admin';
+            }
+            
+            // Create a mock user and token
+            const authToken = 'mock-jwt-token-' + Date.now();
+            const currentUser = {
+                id: 'user-' + Date.now(),
+                email: email,
+                name: email.split('@')[0],
+                role: role
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('authToken', authToken);
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            // Hide the modal
+            document.getElementById('login-modal').classList.remove('show');
+            document.getElementById('login-modal').style.display = 'none';
+            document.getElementById('login-modal').removeAttribute('aria-modal');
+            document.getElementById('login-modal').removeAttribute('role');
+            
+            // Show success message
+            alert('Login successful as ' + role + '. Refreshing page...');
+            
+            // Reload the page to apply the login changes
+            window.location.reload();
+        }
+        
+        function simulateRegistration(name, email, password, role) {
+            // Hide the modal
+            document.getElementById('register-modal').classList.remove('show');
+            document.getElementById('register-modal').style.display = 'none';
+            document.getElementById('register-modal').removeAttribute('aria-modal');
+            document.getElementById('register-modal').removeAttribute('role');
+            
+            // Show success message
+            alert('Registration successful as ' + role + '. Please login.');
+            
+            // Pre-fill the login form and show login modal
+            document.getElementById('login-email').value = email;
+            
+            // Show login modal
+            document.getElementById('login-modal').classList.add('show');
+            document.getElementById('login-modal').style.display = 'block';
+            document.getElementById('login-modal').setAttribute('aria-modal', 'true');
+            document.getElementById('login-modal').setAttribute('role', 'dialog');
+        }
+        
+        function logout() {
+            // Clear authentication data
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('currentUser');
+            
+            // Show success message
+            alert('Logged out successfully. Refreshing page...');
+            
+            // Reload the page to apply the logout changes
+            window.location.reload();
+        }
+        
+        function showSection(sectionId) {
+            console.log('Showing section:', sectionId);
+            
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+                section.style.display = 'none';
+            });
+            
+            // Show the selected section
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+                selectedSection.style.display = 'block';
+                
+                // Update active state in navigation
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active');
+                    if (link.id === sectionId.replace('-section', '-link')) {
+                        link.classList.add('active');
+                    }
+                });
+            } else {
+                console.error('Section not found:', sectionId);
+            }
+        }
+        
+        function runSystemCheck() {
+            // Simulate system check
+            console.log('Running system check...');
+            setTimeout(() => {
+                console.log('System check completed.');
+            }, 2000);
+        }
+    </script>
+
+    <script src="app.js"></script>
+</body>
+</html>

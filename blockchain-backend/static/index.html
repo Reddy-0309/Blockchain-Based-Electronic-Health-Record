@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blockchain EHR System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --text: #333;
+            --text-light: #7f8c8d;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: #f9f9f9;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(rgba(255, 255, 255, 0.1) 10%, transparent 10.5%);
+            background-size: 20px 20px;
+            transform: rotate(30deg);
+            z-index: 1;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 2;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo i {
+            margin-right: 0.5rem;
+            font-size: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn-primary {
+            background-color: var(--accent);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 2px solid white;
+        }
+        
+        /* Features */
+        .features {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: var(--primary);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            background-color: var(--secondary);
+            margin: 1rem auto 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        .feature-desc {
+            color: var(--text-light);
+        }
+        
+        /* API Section */
+        .api-section {
+            background-color: var(--light);
+            padding: 5rem 2rem;
+        }
+        
+        .api-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .endpoints {
+            margin-top: 3rem;
+        }
+        
+        .endpoint {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--box-shadow);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .endpoint h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .endpoint h3 i {
+            margin-right: 0.5rem;
+            color: var(--secondary);
+        }
+        
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            background-color: var(--secondary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .endpoint-method.post {
+            background-color: var(--success);
+        }
+        
+        .endpoint-method.get {
+            background-color: var(--secondary);
+        }
+        
+        .endpoint-method.put {
+            background-color: var(--warning);
+        }
+        
+        .endpoint-method.delete {
+            background-color: var(--danger);
+        }
+        
+        code {
+            background-color: #f1f2f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+        
+        pre {
+            background-color: #f1f2f6;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 5rem 2rem;
+            text-align: center;
+        }
+        
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .cta-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 300;
+        }
+        
+        .cta-content p {
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        /* Footer */
+        .footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 2rem;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+        
+        .footer-col h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        .footer-col h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 30px;
+            height: 2px;
+            background-color: var(--secondary);
+        }
+        
+        .footer-col p {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            opacity: 0.8;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--secondary);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: white;
+            transition: var(--transition);
+        }
+        
+        .social-links a:hover {
+            background-color: var(--secondary);
+            transform: translateY(-3px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                margin-bottom: 1rem;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-cubes"></i>
+                <span>BlockEHR</span>
+            </div>
+            <h1>Blockchain-Based Electronic Health Records System</h1>
+            <p>A secure, transparent, and efficient platform for managing electronic health records using blockchain technology.</p>
+            <div class="cta-buttons">
+                <a href="/swagger" class="btn btn-primary">API Documentation</a>
+                <a href="/api-docs" class="btn btn-secondary">View API Spec</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features">
+        <h2 class="section-title">Key Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3 class="feature-title">Secure & Private</h3>
+                <p class="feature-desc">End-to-end encryption ensures your health data remains private and secure. Blockchain technology provides tamper-proof records.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3 class="feature-title">Interoperable</h3>
+                <p class="feature-desc">Seamlessly share and access health records across different healthcare providers and systems with standardized formats.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <h3 class="feature-title">Patient Control</h3>
+                <p class="feature-desc">Patients maintain ownership and control over who can access their health information with granular permission settings.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="feature-title">Immutable History</h3>
+                <p class="feature-desc">Complete audit trail of all record access and modifications for full transparency and accountability.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Section -->
+    <section class="api-section">
+        <div class="api-container">
+            <h2 class="section-title">API Endpoints</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">Our comprehensive API allows secure access to electronic health records stored on the blockchain.</p>
+            
+            <div class="endpoints">
+                <div class="endpoint">
+                    <h3>
+                        <span class="endpoint-method post">POST</span>
+                        Create Record
+                    </h3>
+                    <p><code>/api/create_record</code></p>
+                    <p>Creates a new health record on the blockchain.</p>
+                    <p>Example request:</p>
+                    <pre>{
+  "data": "Patient health record data",
+  "record_type": "MedicalHistory",
+  "patient_id": "patient123",
+  "provider_id": "doctor456",
+  "timestamp": "2025-04-24T12:00:00Z"
+}</pre>
+                </div>
+                
+                <div class="endpoint">
+                    <h3>
+                        <span class="endpoint-method get">GET</span>
+                        Get Patient Records
+                    </h3>
+                    <p><code>/api/get_patient_records?patient_id=patient123</code></p>
+                    <p>Retrieves all health records for a specific patient.</p>
+                </div>
+                
+                <div class="endpoint">
+                    <h3>
+                        <span class="endpoint-method post">POST</span>
+                        Create Collaborative Note
+                    </h3>
+                    <p><code>/api/create_collaborative_note</code></p>
+                    <p>Creates a collaborative care note with multiple healthcare providers.</p>
+                    <p>Example request:</p>
+                    <pre>{
+  "patient_id": "patient123",
+  "provider_id": "doctor456",
+  "collaborators": ["nurse789", "specialist101"],
+  "note_content": "Patient showing improvement after treatment",
+  "timestamp": "2025-04-24T12:30:00Z"
+}</pre>
+                </div>
+                
+                <div class="endpoint">
+                    <h3>
+                        <span class="endpoint-method get">GET</span>
+                        Validate Blockchain
+                    </h3>
+                    <p><code>/api/validate_blockchain</code></p>
+                    <p>Validates the integrity of the blockchain to ensure no tampering has occurred.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Transform Healthcare Data Management?</h2>
+            <p>Our blockchain-based EHR system provides the security, transparency, and efficiency needed for modern healthcare.</p>
+            <a href="/swagger" class="btn btn-primary">Explore the API</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-col">
+                <h3>About BlockEHR</h3>
+                <p>A cutting-edge blockchain-based electronic health records system designed to revolutionize healthcare data management.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="/swagger">API Documentation</a></li>
+                    <li><a href="/api-docs">API Specification</a></li>
+                    <li><a href="#">Whitepaper</a></li>
+                    <li><a href="#">Developer Guide</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">HIPAA Compliance</a></li>
+                    <li><a href="#">Data Protection</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <p><i class="fas fa-envelope"></i> info@blockehr.example.com</p>
+                <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                <p><i class="fas fa-map-marker-alt"></i> 123 Blockchain Ave, Silicon Valley, CA</p>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2025 BlockEHR - Blockchain-Based Electronic Health Records System. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
