@@ -134,7 +134,7 @@ function Layout() {
                 color="inherit"
               >
                 <Avatar sx={{ bgcolor: '#1565c0' }}>
-                  {currentUser.name.charAt(0).toUpperCase()}
+                  {(currentUser?.name || 'User').charAt(0).toUpperCase()}
                 </Avatar>
               </IconButton>
               <Menu
@@ -154,9 +154,9 @@ function Layout() {
               >
                 <MenuItem disabled>
                   <Typography variant="body2">
-                    Signed in as <strong>{currentUser.name}</strong>
+                    Signed in as <strong>{currentUser?.name || 'User'}</strong>
                     <br />
-                    <small>{currentUser.userType}</small>
+                    <small>{currentUser?.userType || 'Unknown'}</small>
                   </Typography>
                 </MenuItem>
                 <Divider />
